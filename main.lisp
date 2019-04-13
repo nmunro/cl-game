@@ -23,13 +23,20 @@
   (format t " -> HP: ~A~%" (gethash 'hp entity)))
 
 (defun attack (e1 e2 amount)
-  "Function to attack with an entity"
-  (format
-    t
-    "Player hit entity for ATK ~A with DEF ~A~%"
-    (+ amount (gethash 'atk e1))
-    (- (gethash 'def e2) amount))
-  (setf (gethash 'hp e2) (- (gethash 'hp e2) (+ amount (gethash 'atk e1)))))
+  "Function to attack an entity"
+  (let ((dmg (- (+ amount (gethash 'atk e1)) (gethash 'def e2))))
+    (format
+      t
+      "~A hit ~A for DMG:~A with DEF:~A~%"
+      (gethash 'name e1)
+      (gethash 'name e2)
+      dmg
+      (gethash 'def e2))
+
+      ;; Ensure negative numbers aren't subtracted, else health
+      ;; will actually go up!
+      (if (> dmg 0)
+        (setf (gethash 'hp e2) (- (gethash 'hp e2) dmg)))))
 
 (defun is-alive? (entity)
   (> (gethash 'hp entity) 0))
