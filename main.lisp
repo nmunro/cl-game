@@ -1,12 +1,20 @@
+(defstruct entity
+  name
+  exp
+  level
+  atk
+  def
+  hp)
+
 (defun create-entity (name)
   "Create an entity in the game"
-  (let ((entity (make-hash-table)))
-    (setf (gethash 'name entity) name)
-    (setf (gethash 'exp entity) 0)
-    (setf (gethash 'level entity) 1)
-    (setf (gethash 'atk entity) 10)
-    (setf (gethash 'def entity) 10)
-    (setf (gethash 'hp entity) 100)
+  (let ((entity (make-entity)))
+    (setf (entity-name entity) name
+      (entity-exp entity) 0
+      (entity-level entity) 1
+      (entity-atk entity) 10
+      (entity-def entity) 10
+      (entity-hp entity) 100)
    entity))
 
 (defun create-player ()
@@ -17,46 +25,46 @@
 (defun display-entity (entity)
   "Display information about an entity"
   (format t "Info:~%")
-  (format t " -> Name: ~A~%" (gethash 'name entity))
-  (format t " -> Level: ~A~%" (gethash 'level entity))
-  (format t " -> ATK: ~A~%" (gethash 'atk entity))
-  (format t " -> DEF: ~A~%" (gethash 'def entity))
-  (format t " -> HP: ~A~%" (gethash 'hp entity)))
+  (format t " -> Name: ~A~%" (entity-name entity))
+  (format t " -> Level: ~A~%" (entity-level entity))
+  (format t " -> ATK: ~A~%" (entity-atk entity))
+  (format t " -> DEF: ~A~%" (entity-def entity))
+  (format t " -> HP: ~A~%" (entity-hp entity)))
 
 (defun attack (e1 e2 amount)
   "Function to attack an entity"
-  (let ((dmg (- (+ amount (gethash 'atk e1)) (gethash 'def e2))))
+  (let ((dmg (- (+ amount (entity-atk e1)) (entity-def e2))))
     (format
       t
       "You attack: ~A hits ~A for DMG:~A with DEF:~A~%"
-      (gethash 'name e1)
-      (gethash 'name e2)
+      (entity-name e1)
+      (entity-name e2)
       dmg
-      (gethash 'def e2))
+      (entity-def e2))
 
       ;; Ensure negative numbers aren't subtracted, else health
       ;; will actually go up!
       (if (> dmg 0)
-        (setf (gethash 'hp e2) (- (gethash 'hp e2) dmg)))))
+        (setf (entity-hp e2) (- (entity-hp e2) dmg)))))
 
 (defun defend (e1 e2 amount)
   "Function to defend against an entity attack"
-  (let ((dmg (- (+ amount (gethash 'atk e1)) (* 2 (gethash 'def e2)))))
+  (let ((dmg (- (+ amount (entity-atk e1)) (* 2 (entity-def e2)))))
     (format
       t
       "You defend: ~A hits ~A for DMG:~A with DEF:~A~%"
-      (gethash 'name e1)
-      (gethash 'name e2)
+      (entity-name e1)
+      (entity-name e2)
       dmg
-      (gethash 'def e2))
+      (entity-def e2))
 
       ;; Ensure negative numbers aren't subtracted, else health
       ;; will actually go up!
       (if (> dmg 0)
-        (setf (gethash 'hp e2) (- (gethash 'hp e2) dmg)))))
+        (setf (entity-hp e2) (- (entity-hp e2) dmg)))))
 
 (defun is-alive? (entity)
-  (> (gethash 'hp entity) 0))
+  (> (entity-hp entity) 0))
 
 (defun user-input ()
   (format t "Please enter a command: ")
@@ -67,7 +75,7 @@
   (format
     t
     "Welcome ~A, you encounter a Goblin, it attacks.~%What do you do? "
-    (gethash 'name player))
+    (entity-name player))
 
     (let ((action (user-input)))
       (cond
