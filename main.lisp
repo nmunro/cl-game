@@ -27,37 +27,30 @@
   (format t " -> DEF: ~A~%" (entity-def entity))
   (format t " -> HP: ~A~%" (entity-hp entity)))
 
+(defun combat (action dmg e1 e2)
+  (format
+    t
+    "~A: ~A hits ~A for DMG:~A with DEF:~A~%"
+    action
+    (entity-name e1)
+    (entity-name e2)
+    dmg
+    (entity-def e2))
+
+    ;; Ensure negative numbers aren't subtracted, else health
+    ;; will actually go up!
+    (if (> dmg 0)
+      (setf (entity-hp e2) (- (entity-hp e2) dmg))))
+
 (defun attack (e1 e2 amount)
   "Function to attack an entity"
   (let ((dmg (- (+ amount (entity-atk e1)) (entity-def e2))))
-    (format
-      t
-      "You attack: ~A hits ~A for DMG:~A with DEF:~A~%"
-      (entity-name e1)
-      (entity-name e2)
-      dmg
-      (entity-def e2))
-
-      ;; Ensure negative numbers aren't subtracted, else health
-      ;; will actually go up!
-      (if (> dmg 0)
-        (setf (entity-hp e2) (- (entity-hp e2) dmg)))))
+    (combat "attack" dmg e1 e2)))
 
 (defun defend (e1 e2 amount)
   "Function to defend against an entity attack"
   (let ((dmg (- (+ amount (entity-atk e1)) (* 2 (entity-def e2)))))
-    (format
-      t
-      "You defend: ~A hits ~A for DMG:~A with DEF:~A~%"
-      (entity-name e1)
-      (entity-name e2)
-      dmg
-      (entity-def e2))
-
-      ;; Ensure negative numbers aren't subtracted, else health
-      ;; will actually go up!
-      (if (> dmg 0)
-        (setf (entity-hp e2) (- (entity-hp e2) dmg)))))
+    (combat "defend" dmg e1 e2)))
 
 (defun is-alive? (entity)
   (> (entity-hp entity) 0))
@@ -73,19 +66,20 @@
 
 (defun init-stage (stage)
   "A function to read in a stage and init enemies, items etc"
-  (format t "Stage: ~A~%" stage))
+  (let ((stage (make-stage)))
+    (setf (stage-desc stage) "This is a test")
+    stage))
 
 (defun game-loop (player data)
-  ;; Print chapter
-  (format t "~A~%" (cdr (car (car data))))
+  (let ((stage (init-stage (car data))))
+    ;; Print chapter
+    (format t "~A~%" (stage-desc stage))
 
-  ;(init-stage (car data))
-
-  ;; Bail out if data is empty, story is over.
-  (if (null data)
+    ;; Bail out if data is empty, story is over.
+    (if (null stage)
       "Game Over!"
       (progn
-        (let ((action (user-input)) (entity nil))
+        (let ((action (user-input)))
           (cond
             ;; Help
             ((or (equal action "help") (equal action "?"))
@@ -110,7 +104,7 @@
                 (game-loop player (cdr data)))))
 
             ;; Loop if nothing, don't advance story
-            (t (game-loop player data)))))))
+            (t (game-loop player data))))))))
 
 (defun main ()
   (let ((player (create-player)))
