@@ -1,23 +1,22 @@
 [
     {
-        "desc": "You awaken, there's water dripping somewhere, you don't remember how you got here, it tastes like you've been drinking, but the crusted blood on your lips and the effort it takes to keep your left eye open suggests something went south. Beside you is a broken sword, before you have time to gather your thoughts a mutilated beast rounds the corner and charges towards you, you grab the sword, and ready yourself...",
+        "text": "You awaken, there's water dripping somewhere, you don't remember how you got here, it tastes like you've been drinking, but the crusted blood on your lips and the effort it takes to keep your left eye open suggests something went south. Beside you is a broken sword, before you have time to gather your thoughts a mutilated beast rounds the corner and charges towards you, you grab the sword, and ready yourself...",
         "enemies": [
-            {"name": "mutilated beast", "hp": 75}
+            "mutilated beast"
         ],
-        "items": [
-            {"name": "health potion", "strength": 50}
-        ],
-        "actions": [
-            "attack",
-            "defend"
-        ]
+        "actions": ["attack"],
+        "end": 0
     },
     {
-        "desc": "You slay the mutilated beast, how could something even exist, you are undecided if your dismemberment of the unfortunate creature returned it to normality, if even in death. Your head hurts and combat fatigued you.",
+        "text": "You slay the mutilated beast, how could something even exist, you are undecided if your dismemberment of the unfortunate creature returned it to normality, if even in death. Your head hurts and combat fatigued you.",
         "enemies": [],
-        "items": []
+        "actions": ["explore"],
+        "end": 0
     },
     {
-        "desc": "Final bit"
+        "text": "You enter a local pub, it seems they seem to recognise you, you begin to have a feeling you sustained your amnesia and wounds from this bar. You are right. Something hard hits your head, the world goes dark. You died.",
+        "enemies": [],
+        "actions": [],
+        "end": 1
     }
 ]
