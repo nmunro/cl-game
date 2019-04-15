@@ -1,16 +1,12 @@
-(defstruct entity
-  name
-  exp
-  level
-  atk
-  def
-  hp)
+(defstruct entity name ex level atk def hp)
+(defstruct stage desc enemies items actions)
 
 (defun create-entity (name)
   "Create an entity in the game"
   (let ((entity (make-entity)))
-    (setf (entity-name entity) name
-      (entity-exp entity) 0
+    (setf
+      (entity-name entity) (string-capitalize name)
+      (entity-ex entity) 0
       (entity-level entity) 1
       (entity-atk entity) 10
       (entity-def entity) 10
@@ -67,24 +63,61 @@
   (> (entity-hp entity) 0))
 
 (defun user-input ()
-  (format t "Please enter a command: ")
+  (format t "What do you do? ")
   (let ((cmd (string-downcase (read-line))))
     cmd))
 
-(defun game-loop (player entity)
-  (format
-    t
-    "Welcome ~A, you encounter a Goblin, it attacks.~%What do you do? "
-    (entity-name player))
+(defun help ()
+  "Function to display help to the user"
+  (format t "Help goes here.~%"))
 
-    (let ((action (user-input)))
-      (cond
-        ((equal action "attack") ((lambda ()
-          (attack player entity (random 25)) (display-entity player))))
+(defun init-stage (stage)
+  "A function to read in a stage and init enemies, items etc"
+  (format t "Stage: ~A~%" stage))
 
-        ((equal action "defend") ((lambda ()
-          (defend player entity (random 25)) (display-entity player))))
+(defun game-loop (player data)
+  ;; Print chapter
+  (format t "~A~%" (cdr (car (car data))))
 
-        (t "Dunno"))))
+  ;(init-stage (car data))
 
-(game-loop (create-player) (create-entity "Gobin"))
+  ;; Bail out if data is empty, story is over.
+  (if (null data)
+      "Game Over!"
+      (progn
+        (let ((action (user-input)) (entity nil))
+          (cond
+            ;; Help
+            ((or (equal action "help") (equal action "?"))
+              ((lambda ()
+                (help)
+                (game-loop player data))))
+
+            ;; Quitting
+            ((or (equal action "leave") (equal action "quit"))
+             "Game Over")
+
+            ;; Attack
+            ((equal action "attack")
+            ((lambda ()
+              (format t "You attack!~%")
+              (game-loop player (cdr data)))))
+
+            ;; Defend
+            ((equal action "defend")
+              ((lambda ()
+                (format t "You defend!~%")
+                (game-loop player (cdr data)))))
+
+            ;; Loop if nothing, don't advance story
+            (t (game-loop player data)))))))
+
+(defun main ()
+  (let ((player (create-player)))
+    (format t "Welcome, ~A.~%" (entity-name player))
+    (with-input-from-string
+      (script
+        (uiop:read-file-string "~/dev/lisp/common/cl-game/script.json"))
+      (game-loop player (json:decode-json script)))))
+
+(main)
